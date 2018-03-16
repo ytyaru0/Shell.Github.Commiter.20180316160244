@@ -32,20 +32,17 @@ IsRegistedUser () {
     username=$1
 }
 GetPassMail () {
-    local username=$1
     local sql="select Password, MailAddress from Accounts where Username='$username';"
     local select=`QuerySqlite "$sql"`
     # "|"→"\n"→改行
     local value=`echo $select | sed -e "s/|/\\\\n/g"`
-    echo -e "$value"
-}
-CheckPassword () {
+    local pass_mail=(`echo -e "$value"`)
+    password=${pass_mail[0]}
+    mailaddr=${pass_mail[1]}
     [ -z "$password" ] && { echo "パスワードが見つかりませんでした。DBを確認してください。"; exit 1; }
     [ -z "$mailaddr" ] && { echo "メールアドレスが見つかりませんでした。DBを確認してください。"; exit 1; }
 }
 OverwriteConfig () {
-    username=$1
-    password=$2
     local before="	url = https://github.com/"
     local after="	url = https://${username}:${password}@github.com/"
     local config=".git/config"
@@ -75,7 +72,7 @@ AddCommitPush () {
     if [ -n "$answer" ]; then
         git add .
         git commit -m "$answer"
-        OverwriteConfig "$username" "$password"
+        OverwriteConfig
         # stderrにパスワード付URLが見えてしまうので隠す
         git push origin master 2>&1 | grep -v http
     fi
@@ -88,10 +85,7 @@ ExistReadMe
 [ 0 -lt $# ] && IsRegistedUser $1
 
 # パスワード取得と設定
-pass_mail=(`GetPassMail $username`)
-password=${pass_mail[0]}
-mailaddr=${pass_mail[1]}
-CheckPassword
+GetPassMail
 git config --local user.name $username
 git config --local user.email "$mailaddr"
 
@@ -101,3 +95,7 @@ echo "$username/$repo_name"
 CreateRepository
 CheckView
 AddCommitPush
+
+unset username
+unset password
+unset mailaddr
