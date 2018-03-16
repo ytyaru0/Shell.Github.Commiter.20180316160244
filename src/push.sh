@@ -1,24 +1,11 @@
-CheckArguments () {
-    if [ ! -d "$repo_path" ]; then
-        echo "プログラムエラー。ディレクトリではありません。: $repo_path"
-        exit 1
-    fi
-    if [ -z "$username" ]; then
-        echo "プログラムエラー。ユーザ名を指定してください。: $username"
-        exit 1
-    fi
-    ExistReadMe
-    if [ 1 -ne $? ]; then
-        echo "カレントディレクトリに ReadMe.md が存在しません。リポジトリにしたいなら作成して下さい。: "${repo_path}
-        exit 1
-    fi
-}
 ExistReadMe () {
-    for name in "ReadMe README readme Readme"; do
-        for ext in "md txt" ""; do
-            [ -f "${repo_path}/${name}${ext}" ] && exit 1
+    for name in README ReadMe readme Readme; do
+        for ext in "" .md .txt; do
+            [ -f "${repo_path}/${name}${ext}" ] && return 0
         done
     done
+    echo "カレントディレクトリに ReadMe.md が存在しません。作成してください。: "${repo_path}
+    exit 1
 }
 QuerySqlite () {
     local db_file=$1
@@ -103,10 +90,10 @@ AddCommitPush () {
 
 # $1 Githubユーザ名
 repo_path=`pwd`
+ExistReadMe
+[ 0 -ne $? ] && return
 [ 0 -eq $# ] && SelectUser
 [ 0 -lt $# ] && username=$1
-CheckArguments
-[ 0 -ne $? ] && return
 
 # パスワード取得と設定
 pass_mail=(`GetPassMail $username`)
