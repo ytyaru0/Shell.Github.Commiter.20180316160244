@@ -23,12 +23,7 @@ SelectUser () {
     local sql="select Username from Accounts order by Username asc;"
     local select=`QuerySqlite "$sql"`
     echo "ユーザを選択してください。"
-    select i in $select; do
-        if [ -n "$i" ]; then
-            username=$i
-            break
-        fi
-    done
+    select i in $select; do [ -n "$i" ] && { username=$i; break; }; done
 }
 IsRegistedUser () {
     local sql="select COUNT(*) as count from Accounts where Username='$1';"
