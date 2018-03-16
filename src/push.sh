@@ -28,10 +28,7 @@ SelectUser () {
 IsRegistedUser () {
     local sql="select COUNT(*) as count from Accounts where Username='$1';"
     local select=`QuerySqlite "$sql"`
-    if [ "0" == "$select" ]; then
-        echo "指定されたユーザ名はDBに登録されていません。: '$1' $db_file"
-        exit 1
-    fi
+    [ "0" == "$select" ] && { echo "指定されたユーザ名はDBに登録されていません。: '$1' $db_file"; exit 1; }
     username=$1
 }
 GetPassMail () {
@@ -43,14 +40,8 @@ GetPassMail () {
     echo -e "$value"
 }
 CheckPassword () {
-    if [ ! -n "$password" ]; then
-        echo "パスワードが見つかりませんでした。DBを確認してください。"
-        exit 1
-    fi
-    if [ ! -n "$mailaddr" ]; then
-        echo "メールアドレスが見つかりませんでした。DBを確認してください。"
-        exit 1
-    fi
+    [ -z "$password" ] && { echo "パスワードが見つかりませんでした。DBを確認してください。"; exit 1; }
+    [ -z "$mailaddr" ] && { echo "メールアドレスが見つかりませんでした。DBを確認してください。"; exit 1; }
 }
 OverwriteConfig () {
     username=$1
@@ -86,8 +77,6 @@ AddCommitPush () {
         git commit -m "$answer"
         OverwriteConfig "$username" "$password"
         # stderrにパスワード付URLが見えてしまうので隠す
-        # https://imokuri123.com/blog/2016/01/git-push-output-is-stderr.html
-        # git push origin master
         git push origin master 2>&1 | grep -v http
     fi
 }
