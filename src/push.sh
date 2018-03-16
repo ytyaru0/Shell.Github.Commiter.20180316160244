@@ -1,3 +1,4 @@
+#!/bin/bash
 ExistReadMe () {
     for name in README ReadMe readme Readme; do
         for ext in "" .md .txt; do
