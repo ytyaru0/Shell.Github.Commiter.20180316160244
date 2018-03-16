@@ -12,15 +12,40 @@ CheckArguments () {
         exit 1
     fi
 }
-GetPassMail () {
-    local username=$1
-    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
-    local sql="select Password, MailAddress from Accounts where Username='$username';"
-    local this_dir=`dirname $0`
+QuerySqlite () {
+    local db_file=$1
+    local sql=$2
+    local this_dir=`dirname $repo_path`
     local sql_file=${this_dir}/tmp.sql
     echo $sql > $sql_file
     local select=`sqlite3 $db_file < $sql_file`
     rm $sql_file
+    echo $select
+}
+SelectUser () {
+    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
+    local sql="select Username from Accounts order by Username asc;"
+    local select=`QuerySqlite "$db_file" "$sql"`
+    #echo $select
+    echo "ユーザを選択してください。"
+    select i in $select; do
+        if [ -n "$i" ]; then
+            username=$i
+            #echo $i
+            break
+        fi
+    done
+}
+GetPassMail () {
+    local username=$1
+    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
+    local sql="select Password, MailAddress from Accounts where Username='$username';"
+    local select=`QuerySqlite "$db_file" "$sql"`
+    #local this_dir=`dirname $0`
+    #local sql_file=${this_dir}/tmp.sql
+    #echo $sql > $sql_file
+    #local select=`sqlite3 $db_file < $sql_file`
+    #rm $sql_file
     # "|"→"\n"→改行
     local value=`echo $select | sed -e "s/|/\\\\n/g"`
     echo -e "$value"
@@ -56,7 +81,7 @@ CreateRepository () {
     fi
 }
 CheckView () {
-    git status
+    git status -s
     echo "--------------------"
     git add -n .
     echo "--------------------"
@@ -77,7 +102,8 @@ AddCommitPush () {
 
 # $1 Githubユーザ名
 repo_path=`pwd`
-username=$1
+[ 0 -eq $# ] && SelectUser
+[ 0 -lt $# ] && username=$1
 CheckArguments
 [ 0 -ne $? ] && return
 

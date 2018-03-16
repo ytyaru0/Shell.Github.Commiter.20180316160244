@@ -30,10 +30,20 @@ $ push some_username
 
 間違ってカレントディレクトリが`/`などだった場合も、少しは安心。
 
+### User
+
+```sh
+ユーザを選択してください。
+1) user1  3) user3  5) user5
+2) user2  4) user4  6) user6
+```
+
+起動引数がなければ、DBから全ユーザ名を取得して選択肢を出す。辞書順。
+
 ### add前
 
-* git status
-* git add -n .
+* `git status -s`
+* `git add -n .`
 
 `git status`を追加。`git rm some.py`などで削除だけしたときも変化がわかるようにした。
 
