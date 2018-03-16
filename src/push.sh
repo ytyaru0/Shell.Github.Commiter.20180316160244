@@ -9,8 +9,9 @@ ExistReadMe () {
     exit 1
 }
 QuerySqlite () {
-    local db_file=$1
-    local sql=$2
+    local sql=$1
+    [ $# -lt 2 ] && local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
+    [ 2 -le $# ] && local db_file=$2
     local this_dir=`dirname $repo_path`
     local sql_file=${this_dir}/tmp.sql
     echo $sql > $sql_file
@@ -19,9 +20,8 @@ QuerySqlite () {
     echo $select
 }
 SelectUser () {
-    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
     local sql="select Username from Accounts order by Username asc;"
-    local select=`QuerySqlite "$db_file" "$sql"`
+    local select=`QuerySqlite "$sql"`
     echo "ユーザを選択してください。"
     select i in $select; do
         if [ -n "$i" ]; then
@@ -31,9 +31,8 @@ SelectUser () {
     done
 }
 IsRegistedUser () {
-    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
     local sql="select COUNT(*) as count from Accounts where Username='$1';"
-    local select=`QuerySqlite "$db_file" "$sql"`
+    local select=`QuerySqlite "$sql"`
     if [ "0" == "$select" ]; then
         echo "指定されたユーザ名はDBに登録されていません。: '$1' $db_file"
         exit 1
@@ -42,9 +41,8 @@ IsRegistedUser () {
 }
 GetPassMail () {
     local username=$1
-    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
     local sql="select Password, MailAddress from Accounts where Username='$username';"
-    local select=`QuerySqlite "$db_file" "$sql"`
+    local select=`QuerySqlite "$sql"`
     # "|"→"\n"→改行
     local value=`echo $select | sed -e "s/|/\\\\n/g"`
     echo -e "$value"
