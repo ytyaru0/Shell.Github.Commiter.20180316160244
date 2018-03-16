@@ -29,6 +29,16 @@ SelectUser () {
         fi
     done
 }
+IsRegistedUser () {
+    local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
+    local sql="select COUNT(*) as count from Accounts where Username='$1';"
+    local select=`QuerySqlite "$db_file" "$sql"`
+    if [ "0" == "$select" ]; then
+        echo "指定されたユーザ名はDBに登録されていません。: '$1' $db_file"
+        exit 1
+    fi
+    username=$1
+}
 GetPassMail () {
     local username=$1
     local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
@@ -91,9 +101,8 @@ AddCommitPush () {
 # $1 Githubユーザ名
 repo_path=`pwd`
 ExistReadMe
-[ 0 -ne $? ] && return
 [ 0 -eq $# ] && SelectUser
-[ 0 -lt $# ] && username=$1
+[ 0 -lt $# ] && IsRegistedUser $1
 
 # パスワード取得と設定
 pass_mail=(`GetPassMail $username`)

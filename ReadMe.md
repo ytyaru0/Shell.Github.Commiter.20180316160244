@@ -2,16 +2,21 @@
 
 簡易アップローダ。
 
-以下のアップローダで作成されたDBからパスワードとメアドを取得する。.shにパスワードをハードコーディングせずに済む。
+[こちら](https://github.com/ytyaru0/Shell.Github.Commiter.20180309122449)のカレントディレクトリ版。
+
+# 使い方
+
+## 準備
+
+* 要`sqlite3`コマンド
+* アカウントDBを用意する
+
+本ツールはDBからパスワードとメアドを取得する。DBは以下のアップローダで作成されたもの。（.shにパスワードをハードコーディングせずに済む）
 
 * https://github.com/ytyaru0/GitHub.Uploader.Pi3.Https.201802210700
 * https://github.com/ytyaru0/GitHub.Uploader.Pi3.Https.201803020700
 
-[こちら](https://github.com/ytyaru0/Shell.Github.Commiter.20180309122449)のカレントディレクトリ版。
-
-要`sqlite3`コマンド。
-
-# 使い方
+## 実行
 
 ```sh
 $ push some_username
@@ -20,7 +25,11 @@ $ push some_username
 * `push`ファイルを環境変数`PATH`が通っている所に配置する。
 * カレントディレクトリをリポジトリと想定する
 
-## 確認画面の改善
+## 確認表示
+
+### JSON
+
+[リモートリポジトリ生成API](https://developer.github.com/v3/repos/#create)の応答。何か変わっても知れるように。（デバッグ）
 
 ### ReadMe
 
@@ -39,6 +48,12 @@ $ push some_username
 ```
 
 起動引数がなければ、DBから全ユーザ名を取得して選択肢を出す。辞書順。
+
+```sh
+指定されたユーザ名はDBに登録されていません。
+```
+
+起動引数でユーザ名を指定しても、DBになければエラーになる。
 
 ### add前
 
