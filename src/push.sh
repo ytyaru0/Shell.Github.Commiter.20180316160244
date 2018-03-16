@@ -3,14 +3,22 @@ CheckArguments () {
         echo "プログラムエラー。ディレクトリではありません。: $repo_path"
         exit 1
     fi
-    if [ ! -f "${repo_path}/ReadMe.md" ] && [ ! -f "${repo_path}/ReadMe.txt" ] && [ ! -f "${repo_path}/ReadMe" ] && [ ! -f "${repo_path}/README.md" ] && [ ! -f "${repo_path}/README.txt" ] && [ ! -f "${repo_path}/README" ]; then
+    if [ -z "$username" ]; then
+        echo "プログラムエラー。ユーザ名を指定してください。: $username"
+        exit 1
+    fi
+    ExistReadMe
+    if [ 1 -ne $? ]; then
         echo "カレントディレクトリに ReadMe.md が存在しません。リポジトリにしたいなら作成して下さい。: "${repo_path}
         exit 1
     fi
-    if [ ! -n "$username" ]; then
-        echo "リポジトリパス、ユーザ名、の順に引数を渡してください。ユーザ名を指定してください。"
-        exit 1
-    fi
+}
+ExistReadMe () {
+    for name in "ReadMe README readme Readme"; do
+        for ext in "md txt" ""; do
+            [ -f "${repo_path}/${name}${ext}" ] && exit 1
+        done
+    done
 }
 QuerySqlite () {
     local db_file=$1
@@ -26,12 +34,10 @@ SelectUser () {
     local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
     local sql="select Username from Accounts order by Username asc;"
     local select=`QuerySqlite "$db_file" "$sql"`
-    #echo $select
     echo "ユーザを選択してください。"
     select i in $select; do
         if [ -n "$i" ]; then
             username=$i
-            #echo $i
             break
         fi
     done
@@ -41,11 +47,6 @@ GetPassMail () {
     local db_file=~/root/script/py/GitHub.Uploader.Pi3.Https.201802210700/res/db/GitHub.Accounts.sqlite3
     local sql="select Password, MailAddress from Accounts where Username='$username';"
     local select=`QuerySqlite "$db_file" "$sql"`
-    #local this_dir=`dirname $0`
-    #local sql_file=${this_dir}/tmp.sql
-    #echo $sql > $sql_file
-    #local select=`sqlite3 $db_file < $sql_file`
-    #rm $sql_file
     # "|"→"\n"→改行
     local value=`echo $select | sed -e "s/|/\\\\n/g"`
     echo -e "$value"
