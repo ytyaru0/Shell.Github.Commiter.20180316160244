@@ -42,17 +42,17 @@ class Ssh(Protocol):
         if url.startswith('ssh://'):
             # B. ssh://git@github.com:22/kyanny/hello.git
             urls = urllib.parse.urlsplit(url)
-            self.__service, self.__host = urls[1].split('@')
+            self.__service, self.__host = urls.netloc.split('@')
             if ':' in self.__host:
                 self.__host, self.__port = self.__host.split(':')
+            self._user = urls.path.split('/')[1]
+            self._repo = urls.path.split('/')[2][:-1*len('.git')]
         else:
             # A. git@{SSH_HOST}:{user}/{repo}.git
             service, other = url.split('@')
             ssh_host, other = other.split(':')
-            user, repo = url.split('/')
-            if repo.endswith('.git'): repo = repo[:-1*(len('.git')+1)]
-            self.__ssh_user = user
-            self.__ssh_repo = repo
+            self._user, self._repo = other.split('/')
+            if self._repo.endswith('.git'): self._repo = self._repo[:-1*(len('.git'))]
     @property
     def Service(self): return self.__service
     @property
