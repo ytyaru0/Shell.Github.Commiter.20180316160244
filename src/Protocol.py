@@ -18,14 +18,14 @@ class Https(Protocol):
     def __init__(self):
         super().__init__()
         self.__password = None
-    def IsProtocol(self, url): return url.startswith('https://')
+    def IsProtocol(self, url): return url.endswith('.git') and url.startswith('https://')
     def AnalizeUrl(self, url):
-        # A. https://github.com/{user}/{repo}
-        # B. https://${user}:${pass}@github.com/{user}/{repo}
+        # A. https://github.com/{user}/{repo}.git
+        # B. https://${user}:${pass}@github.com/{user}/{repo}.git
         urls = urllib.parse.urlsplit(url)
         path = urls[2]
         self._user = pathlib.PurePath(path).parent.name
-        self._repo = pathlib.PurePath(path).name
+        self._repo = pathlib.PurePath(path).name[:-1*(len('.git'))]
         if '@github.com' in urls[1]:
             userpass = urls[1].replace('@github.com', '')
             user, self.__password = userpass.split(':')

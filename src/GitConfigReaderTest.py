@@ -16,7 +16,7 @@ class GitConfigReaderTest(unittest.TestCase):
         repo = 'Shell.Github.Commiter.20180316160244'
         git_config = """
 [remote "origin"]
-	url = https://github.com/{}/{}
+	url = https://github.com/{}/{}.git
 """.format(user, repo)
         reader = GitConfigReader(self.__make_file_config(git_config))
         self.assertEqual(user, reader.RemoteOriginUser)
@@ -28,7 +28,7 @@ class GitConfigReaderTest(unittest.TestCase):
         repo = 'Shell.Github.Commiter.20180316160244'
         git_config = """
 [remote "origin"]
-	url = https://{0}:{1}@github.com/{0}/{2}
+	url = https://{0}:{1}@github.com/{0}/{2}.git
 """.format(user, password, repo)
         reader = GitConfigReader(self.__make_file_config(git_config))
         self.assertEqual(user, reader.RemoteOriginUser)

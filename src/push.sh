@@ -1,9 +1,10 @@
 #!/bin/bash
 IsSameRepoName () {
     if [ -f "${repo_path}/.git/config" ]; then
-        gitconfig_reponame=$(python3 GetRepoNameForGitConfig.py ${dir_name})
-        if [ $(basename "${repo_path}") == $gitconfig_reponame ]; then
-            echo ".git/configのリポジトリ名とカレントディレクトリ名が一致しません。他所からコピペした.gitを間違って使い回していませんか？: ${gitconfig_reponame}"
+        local gitconfig_reponame=$(python3 GetRepoNameForGitConfig.py "${repo_path}")
+        local cd_name=$(basename "${repo_path}")
+        if [ "${cd_name}" != "${gitconfig_reponame}" ]; then
+            echo -e ".git/configのリポジトリ名とカレントディレクトリ名が一致しません。他所からコピペした.gitを間違って使い回していませんか？\n  .git/configリポジトリ名: ${gitconfig_reponame}\n  カレントディレクトリ名 : ${cd_name}"
             exit 1
         fi
     fi
