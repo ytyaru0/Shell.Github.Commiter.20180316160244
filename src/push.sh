@@ -1,4 +1,14 @@
 #!/bin/bash
+IsSameRepoName () {
+    if [ -f "${repo_path}/.git/config" ]; then
+        gitconfig_reponame=$(python3 GetRepoNameForGitConfig.py ${dir_name})
+        if [ $(basename "${repo_path}") == $gitconfig_reponame ]; then
+            echo ".git/configのリポジトリ名とカレントディレクトリ名が一致しません。他所からコピペした.gitを間違って使い回していませんか？: ${gitconfig_reponame}"
+            exit 1
+        fi
+    fi
+}
+
 ExistReadMe () {
     for name in README ReadMe readme Readme; do
         for ext in "" .md .txt; do
@@ -80,6 +90,7 @@ AddCommitPush () {
 
 # $1 Githubユーザ名
 repo_path=`pwd`
+IsSameRepoName 
 ExistReadMe
 [ 0 -eq $# ] && SelectUser
 [ 0 -lt $# ] && IsRegistedUser $1
